@@ -6,7 +6,7 @@ import torch
 
 class ChatAIService:
     def __init__(self):
-        self.model_name = "microsoft/DialoGPT-medium"  # Or other model
+        self.model_name = "google/gemma-2b-it"  # Or other model
         self.model = None
         self.tokenizer = None
         self.chat_history = []

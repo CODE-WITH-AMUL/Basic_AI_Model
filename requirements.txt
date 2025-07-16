@@ -1,9 +1,9 @@
-Django==5.0.6
-transformers==4.40.0
+Django
+transformers
 torch
-sentencepiece==0.2.0
-accelerate==0.29.2
-gunicorn==21.2.0
-whitenoise==6.6.0
-python-dotenv==1.0.0
-pillow==10.2.0
+sentencepiece
+accelerate
+gunicorn
+whitenoise
+python-dotenv
+pillow

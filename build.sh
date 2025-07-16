@@ -1,9 +1,11 @@
 #!/bin/bash
-# Install Python dependencies
+# Install system dependencies
+apt-get update && apt-get install -y python3-dev
+
+# Install Python packages
+pip install --upgrade pip
 pip install -r requirements.txt
 
-# Collect static files
+# Django setup
 python manage.py collectstatic --noinput
-
-# Apply database migrations
 python manage.py migrate

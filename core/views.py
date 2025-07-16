@@ -12,7 +12,7 @@ chat_ai = None
 def load_chat_model():
     global chat_ai
     if chat_ai is None:
-        model_name = "microsoft/DialoGPT-medium"  # Or your preferred model
+        model_name = "google/gemma-2b-it"  # Or your preferred model
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         model = AutoModelForCausalLM.from_pretrained(model_name)
         chat_ai = pipeline("text-generation", model=model, tokenizer=tokenizer)
