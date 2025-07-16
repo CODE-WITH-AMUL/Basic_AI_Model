@@ -1,9 +1,11 @@
 Django==5.0.6
 transformers==4.40.0
-torch==2.2.1
+torch==2.2.1+cu118 --find-links https://download.pytorch.org/whl/torch_stable.html  # For CUDA 11.8
+# OR for CPU-only version:
+torch==2.2.1+cpu --index-url https://download.pytorch.org/whl/cpu
 sentencepiece==0.2.0
 accelerate==0.29.2
 gunicorn==21.2.0
 whitenoise==6.6.0
 python-dotenv==1.0.0
-pillow==10.2.0  # Downgraded from 10.3.0 which seems problematic
+pillow==10.2.0
