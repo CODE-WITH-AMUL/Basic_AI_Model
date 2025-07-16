@@ -1,8 +1,6 @@
 Django==5.0.6
 transformers==4.40.0
-torch==2.2.1+cu118 --find-links https://download.pytorch.org/whl/torch_stable.html  # For CUDA 11.8
-# OR for CPU-only version:
-torch==2.2.1+cpu --index-url https://download.pytorch.org/whl/cpu
+torch
 sentencepiece==0.2.0
 accelerate==0.29.2
 gunicorn==21.2.0
