@@ -17,13 +17,13 @@ def load_chat_model():
         model = AutoModelForCausalLM.from_pretrained(model_name)
         chat_ai = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
-@login_required
+# @login_required
 def chat_view(request):
     """Render the main chat interface"""
     return render(request, 'index.html')  # Your single HTML file
 
-@csrf_exempt
-@login_required
+# @csrf_exempt
+# @login_required
 def get_ai_response(request):
     """Handle AJAX requests for AI responses"""
     if request.method == 'POST':
@@ -56,7 +56,7 @@ def get_ai_response(request):
     
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
-@login_required
+# @login_required
 def new_chat(request):
     """Handle request to start a new chat"""
     # In a real app, you might want to save the previous conversation

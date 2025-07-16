@@ -1,7 +1,9 @@
-Django==5.0.6  # or latest stable version
-djangorestframework==3.15.1  # if using Django REST Framework
-psycopg2-binary==2.9.9  # for PostgreSQL (replace with mysqlclient for MySQL)
-python-dotenv==1.0.0  # for environment variables
-gunicorn==21.2.0  # for production deployment (Render uses this)
-whitenoise==6.6.0  # for static files in production
-pillow==10.3.0  # for image handling
+Django==5.0.6
+transformers==4.40.0
+torch==2.2.1
+sentencepiece==0.2.0
+accelerate==0.29.2
+gunicorn==21.2.0
+whitenoise==6.6.0
+python-dotenv==1.0.0
+pillow==10.2.0  # Downgraded from 10.3.0 which seems problematic
