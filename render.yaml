@@ -3,9 +3,9 @@ services:
     name: basic-ai-model
     runtime: python
     buildCommand: "./build.sh"
-    startCommand: "gunicorn your_project_name.wsgi:application"
+    startCommand: "gunicorn ai.wsgi:application"
     envVars:
       - key: DJANGO_SECRET_KEY
         generateValue: true
       - key: PYTHON_VERSION
-        value: "3.10.8"  # Specific version that works with your packages
+        value: "3.10.8"
