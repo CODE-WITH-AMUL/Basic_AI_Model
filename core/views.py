@@ -1,63 +1,74 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
-from transformers import pipeline, AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 import json
 
-# Initialize the AI model (you can move this to services.py if preferred)
-chat_ai = None
+# Conversation history
+conversation_history = []
 
-def load_chat_model():
-    global chat_ai
-    if chat_ai is None:
-        model_name = "google/gemma-2b-it"  # Or your preferred model
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForCausalLM.from_pretrained(model_name)
-        chat_ai = pipeline("text-generation", model=model, tokenizer=tokenizer)
+def load_model():
+    model_name = "tiiuae/falcon-7b-instruct" # Using Gemma 2B
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        device_map="auto",
+        torch_dtype=torch.float16
+    )
+    return model, tokenizer
 
-# @login_required
-def chat_view(request):
-    """Render the main chat interface"""
-    return render(request, 'index.html')  # Your single HTML file
+model, tokenizer = load_model()
 
-# @csrf_exempt
-# @login_required
+@csrf_exempt
 def get_ai_response(request):
-    """Handle AJAX requests for AI responses"""
+    global conversation_history
+    
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
             user_input = data.get('message', '')
             
-            # Load model if not loaded
-            load_chat_model()
+            # Format the prompt with conversation history
+            prompt = format_prompt(conversation_history, user_input)
             
-            # Generate response (adjust parameters as needed)
-            response = chat_ai(
-                user_input,
-                max_length=100,
-                num_return_sequences=1,
-                pad_token_id=chat_ai.tokenizer.eos_token_id,
-                no_repeat_ngram_size=3,
-                do_sample=True,
-                top_k=50,
+            # Generate response
+            inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
+            outputs = model.generate(
+                **inputs,
+                max_new_tokens=256,
+                temperature=0.7,
                 top_p=0.9,
-                temperature=0.7
+                do_sample=True
             )
             
-            return JsonResponse({
-                'response': response[0]['generated_text'].replace(user_input, '').strip()
-            })
+            # Decode and clean response
+            full_response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+            ai_response = extract_ai_response(full_response, prompt)
+            
+            # Update conversation history
+            conversation_history.append({"user": user_input, "ai": ai_response})
+            
+            return JsonResponse({'response': ai_response})
             
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
-# @login_required
-def new_chat(request):
-    """Handle request to start a new chat"""
-    # In a real app, you might want to save the previous conversation
-    return JsonResponse({'status': 'New chat started'})
+def format_prompt(history, new_input):
+    """Format the prompt with conversation history"""
+    prompt = "You are a helpful AI assistant. Answer questions clearly and concisely.\n\n"
+    
+    for turn in history[-4:]:  # Keep last 4 exchanges for context
+        prompt += f"User: {turn['user']}\n"
+        prompt += f"Assistant: {turn['ai']}\n"
+    
+    prompt += f"User: {new_input}\n"
+    prompt += "Assistant:"
+    
+    return prompt
+
+def extract_ai_response(full_text, prompt):
+    """Extract just the AI's response from the full generated text"""
+    return full_text[len(prompt):].split("User:")[0].strip()
